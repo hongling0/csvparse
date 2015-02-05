@@ -17,32 +17,31 @@ SRC_LIB=src/csvparse.c src/transfer.c
 OBJS_LIB=$(addprefix $(OBJDIR),$(patsubst %.c,%.o,$(SRC_LIB)))
 DEPS_LIB=$(patsubst %.o,%.d,$(OBJS_LIB))
 
-$(OBJDIR)%.o:%.c $(OBJDIR)%.d
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
-$(OBJDIR)%.d:%.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -MM $< -MT $(@:.d=.o) -MF $@
-
 
 all:$(STATIC_LIB) $(SHARED_LIB)
-
-$(STATIC_LIB):$(OBJS_LIB)
-	$(AR) $(STATIC_LIB) $(OBJS_LIB)
-$(SHARED_LIB):$(OBJS_LIB)
-	$(CC) $(CFLAGS) $(SHARED) $^ -o $@
 
 list:
 	@echo $(SRC_LIB)
 	@echo $(OBJS_LIB)
 	@echo $(DEPS_LIB)
 
+$(STATIC_LIB):$(OBJS_LIB)
+	$(AR) $(STATIC_LIB) $(OBJS_LIB)
+$(SHARED_LIB):$(OBJS_LIB)
+	$(CC) $(CFLAGS) $(SHARED) $^ -o $@
 
-# ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),clean)
+$(OBJDIR)%.o:%.c $(OBJDIR)%.d
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(OBJDIR)%.d:%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -MM $< -MT $(@:.d=.o) -MF $@
+
 $(shell mkdir -p $(dir $(STATIC_LIB)))
 $(shell mkdir -p $(dir $(SHARED_LIB)))
 $(foreach d,$(OBJS_LIB),$(shell mkdir -p $(dir $(d))))
 -include $(DEPS_LIB)
-# endif
+endif
 
 clean:
 	$(RM) $(STATIC_LIB)

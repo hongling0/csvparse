@@ -1,0 +1,26 @@
+.PHONY:all list clean
+
+RM=rm -rf
+AR=ar rcus
+STATIC_LIB=./lib/libcsvparse.lib
+SHARED_LIB=./lib/libcsvparse.so
+TEST=./test
+INCLUDE=include/
+OBJDIR=obj/
+
+CFLAGS=-Werror -O2 -Wall -g -I$(INCLUDE)
+SHARED=-fPIC --shared
+
+SRC_LIB=src/csvparse.c src/transfer.c
+LIB=LIB
+
+define DO_ANALYSE
+OBJS_$(1)=$$\(addprefix $$\(OBJDIR\),$$\(patsubst %.c,%.o,$$\(SRC_$(1)\)\)\)
+endef
+
+CODE=$(call DO_ANALYSE,$(LIB))
+all:
+	@echo $(CODE)
+	$(eval $(CODE))
+	@echo $(OBJS_LIB)
+
